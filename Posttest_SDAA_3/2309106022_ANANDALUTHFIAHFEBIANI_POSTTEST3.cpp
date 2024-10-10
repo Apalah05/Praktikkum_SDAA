@@ -15,41 +15,6 @@ HasilTambang* head = nullptr;
 HasilTambang dataTambang[MAX];
 int tambang = 0;
 
-struct Stack {
-    HasilTambang data[MAX];
-    int top;
-} stackTambang;
-
-struct Queue {
-    HasilTambang data[MAX];
-    int front, rear;
-} queueTambang;
-
-void initStack() {
-    stackTambang.top = -1;
-}
-
-bool isFull() {
-    return stackTambang.top == MAX - 1;
-}
-
-bool isEmpty() {
-    return stackTambang.top == -1;
-}
-
-void initQueue() {
-    queueTambang.front = -1;
-    queueTambang.rear = -1;
-}
-
-bool isQueueFull() {
-    return (queueTambang.rear == MAX - 1);
-}
-
-bool isQueueEmpty() {
-    return (queueTambang.front == -1 || queueTambang.front > queueTambang.rear);
-}
-
 HasilTambang* Linked(string nama, int jumlah) {
     HasilTambang* baru = new HasilTambang();
     baru->nama = nama;
@@ -65,7 +30,7 @@ void Tampil() {
         cout << i + 1 << ". " << dataTambang[i].nama << " (Jumlah : " << dataTambang[i].jumlah << ")" << endl;
         }
     } else {
-        cout << "<-- DATA HASILTAMBANG KOSONG -->\n";
+        cout << "<-- DATA TAMBANG KOSONG -->\n";
     }
 }
 
@@ -78,21 +43,82 @@ void Tambah() {
         getline(cin, dataTambang[tambang].nama);
         cout << "Jumlah Hasil Tambang: ";
         cin >> dataTambang[tambang].jumlah;
-        
-        HasilTambang* baru = Linked(dataTambang[tambang].nama, dataTambang[tambang].jumlah);
-        if (head == nullptr) {
-            head = baru;
-        } else {
-            HasilTambang* temp = head;
-            while (temp->next != nullptr) {
-                temp = temp->next;
-            }
-            temp->next = baru;
-        }
-
+        nama = dataTambang[tambang].nama;
+        jumlah = dataTambang[tambang].jumlah;
         tambang++;
     } else {
         cout << "<-- DATA TAMBANG INVALID/PENUH -->\n";        
+    }
+
+    HasilTambang* baru = Linked(nama, jumlah);
+
+    if (head == nullptr) {
+        head = baru;
+    } else {
+        HasilTambang* temp = head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        temp->next = baru;
+    }
+}
+
+void Ubah() {
+    Tampil();
+    cout << "Ubah Data Tambang Ke: ";
+    int index;
+    cin >> index;
+
+    if (head == nullptr) {
+        cout << "<-- DATA TAMBANG KOSONG -->\n";
+        return;
+    }
+
+    HasilTambang* temp = head;
+    for (int i = 0; i < index; i++) {
+        if (temp->next == nullptr) {
+            cout << "<-- DATA TAMBANG INVALID --> " << endl;
+            return;
+            }
+            temp = temp->next;
+        }
+        
+        cin.ignore();
+        cout << "Ubah Nama Hasil Tambang Menjadi: ";
+        getline(cin, dataTambang[index - 1].nama);
+        cout << "Ubah Jumlah Hasil Tambang Menjadi: ";
+        cin >> dataTambang[index - 1].jumlah;
+}
+
+void Hapus() {
+    Tampil();
+    cout << "Hapus Data Tambang ke: ";
+    int index;
+    cin >> index;
+
+    if (head == nullptr) {
+        cout << "<-- DATA TAMBANG KOSONG -->\n";
+        return;
+    }
+
+    if (index == 1) {
+        head = head->next;
+    } else {
+        HasilTambang* temp = head;
+        for (int i = 1; i < index - 1; i++) {
+            if (temp->next == nullptr) {
+            cout << "<-- DATA TAMBANG INVALID -->" << endl;
+            return;
+            }
+            temp = temp->next;
+        } 
+        HasilTambang* LinkedHapus = temp->next;
+        if (LinkedHapus == nullptr) {
+            cout << "<-- DATA TAMBANG INVALID -->" << endl;
+            return;
+            } 
+            temp->next = LinkedHapus->next;
+            delete LinkedHapus;
     }
 }
 
@@ -116,142 +142,20 @@ void HasilLinked() {
     cout << "NULL" << endl;
 }
 
-void StackMenu() {
-    int pilihan;
-    do {
-        cout << "Stack Menu:" << endl;
-        cout << "1. Push" << endl;
-        cout << "2. Pop" << endl;
-        cout << "3. Top" << endl;
-        cout << "4. Kembali" << endl;
-        cout << "Pilih Menu: ";
-        cin >> pilihan;
-
-        switch (pilihan) {
-        case 1: {
-            string nama;
-            int jumlah;
-            if (isFull()) {
-                cout << "Stack penuh. Tidak bisa menambah data hasil tambang.\n";
-                break;
-            }
-            cin.ignore();
-            cout << "Masukkan nama Hasil Tambang: ";
-            getline(cin, nama);
-            cout << "Masukkan jumlah Hasil Tambang: ";
-            cin >> jumlah;
-            stackTambang.top++;
-            stackTambang.data[stackTambang.top].nama = nama;
-            stackTambang.data[stackTambang.top].jumlah = jumlah;
-            cout << "Data hasil tambang berhasil ditambahkan ke dalam stack.\n";
-            break;
-        }
-        case 2: {
-            if (isEmpty()) {
-                cout << "Stack kosong. Tidak bisa menghapus data hasil tambang.\n";
-                break;
-            }
-            cout << "Menghapus data hasil tambang " << stackTambang.data[stackTambang.top].nama << " dari stack.\n";
-            stackTambang.top--;
-            break;
-        }
-        case 3: 
-            if (isEmpty()) {
-                cout << "Stack kosong.\n";
-                break;
-            }
-            cout << "Data hasil tambang dalam Stack: \n";
-            for (int i = stackTambang.top; i >= 0; i--) {
-                cout << i + 1 << ". " << stackTambang.data[i].nama << " (Jumlah: " << stackTambang.data[i].jumlah << ")\n";
-            }
-            break;
-        case 4: 
-            return;
-        default:
-            cout << "Pilihan Tidak Tersedia!\n";
-        }
-    } while (true);
-}
-
-void QueueMenu () {
-    int pilihan;
-    do {
-        cout << "Menu Queue" << endl;
-        cout << "1. Enqueue" << endl;
-        cout << "2. Dequeue" << endl;
-        cout << "3. Lihat Queue" << endl;
-        cout << "4. Kembali" << endl;
-        cout << "Pilih Menu: ";
-        cin >> pilihan; 
-
-        switch (pilihan) {
-        case 1: {
-            if (isQueueFull()) {
-                cout << "Queue penuh. Tidak bisa menambah data hasil tambang.\n";
-                break;
-            }
-            if (isQueueEmpty()) {
-                queueTambang.front = 0;
-            }
-
-            string nama;
-            int jumlah;
-
-            cin.ignore();
-            cout << "Masukkan data hasil tambang: ";
-            getline(cin, nama);
-            cout << "Masukkan jumlah hasil tambang: ";
-            cin >> jumlah;
-            
-            queueTambang.rear++;
-            queueTambang.data[queueTambang.rear].nama = nama;
-            queueTambang.data[queueTambang.rear].jumlah = jumlah;
-            cout << "Data hasil tambang berhasil ditambahkan ke dalam Queue.\n";
-            break;
-
-        }
-        case 2: {
-            if (isQueueEmpty()) {
-                cout << "Queue kosong. Tidak ada data hasil tambang untuk dihapus.\n";
-                return;
-            }
-            cout << "Menghapus Data hasil tambang " << queueTambang.data[queueTambang.front].nama << " dari queue.\n";
-            queueTambang.front++;
-            break;
-        }
-        case 3: {
-            if (isQueueEmpty()) {
-                cout << "Queue kosong. Tidak ada data hasil tambang untuk dihapus.\n";
-                return;
-            }
-            cout << "Menghapus data hasil tambang dalam Queue :\n";
-            for (int i = queueTambang.front; i <= queueTambang.rear; i++) {
-                cout << i + 1 << ". " << queueTambang.data[i].nama << " (Jumlah: " << queueTambang.data[i].jumlah << ")\n";
-            }
-            break;
-        }
-        case 4:
-            return;
-        default:
-            cout << "Pilihan Invalid!\n";
-        }   
-    } while (true);
-}
-
 int main() {
-    int pilihan;
-    initStack();
-    initQueue();
+    HasilTambang hasil;    
 
+    int pilihan;
     do {
         cout << "\n=== GUDANG PENDATAAN HASIL TAMBANG DARI PERTAMBANGAN ===\n"
              << "1. Tambah Data Hasil Tambang\n"
-             << "2. Menu Stack\n"
-             << "3. Menu Queue\n"
-             << "4. Hasil Tambang Linked List\n"
-             << "5. Hitung Hasil Tambang Dalam Linked List\n"
-             << "6. Keluar\n"
-             << "Pilih menu yang tertera diatas (1/2/3/4/5/6): ";
+             << "2. Ubah Data Hasil Tambang\n"
+             << "3. Hapus Data Hasil Tambang\n"
+             << "4. Tampilkan Data Hasil Tambang\n"
+             << "5. Hasil Tambang Linked List\n"
+             << "6. Hitung Hasil Tambang Dalam Linked List\n"
+             << "7. Keluar\n"
+             << "Pilih menu yang tertera diatas (1/2/3/4/5/6/7): ";
         cin >> pilihan;
 
         switch (pilihan) {
@@ -259,18 +163,21 @@ int main() {
                 Tambah(); 
                 break;
             case 2: 
-                StackMenu(); 
+                Ubah(); 
                 break;
             case 3: 
-                QueueMenu(); 
+                Hapus(); 
                 break;
             case 4: 
-                HasilLinked(); 
+                Tampil(); 
                 break;
             case 5: 
+                HasilLinked(); 
+                break;
+            case 6: 
                 HitungNode(); 
                 break;
-            case 6:
+            case 7:
                 cout << "Terima kasih telah mendata Hasil Tambang dari pertambangan\n"; 
                 return 0;
             default: 
